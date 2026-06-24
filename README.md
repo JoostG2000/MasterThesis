@@ -1,158 +1,308 @@
 # The role of context in forward-looking disclosure
 
 > **Note**
-> This is the public version of the thesis repository. The official assessed thesis remains the version submitted through the university’s thesis submission system. This repository is shared for transparency and educational purposes and excludes all licensed WRDS-derived data, including raw data, processed datasets, transcript text, and intermediate files. Any later changes to the code, notebooks, or documentation should be interpreted as independent post-submission refinements.
-
+> This is the public version of the thesis repository. The official assessed thesis remains the version submitted through the university's thesis submission system. This repository is shared for transparency and educational purposes and excludes all licensed WRDS-derived data, including raw data, processed datasets, transcript text, model outputs, and intermediate files. Any later changes to the code, notebooks, or documentation should be interpreted as independent post-submission refinements.
 
 **The role of context in forward-looking disclosure: Evidence from earnings conference calls**
 
-The thesis examines whether large language model-based measures of forward-looking information provide incremental explanatory power for abnormal stock returns around earnings conference calls, relative to a traditional dictionary-based measure.
+This repository contains the notebook-based empirical workflow for a master thesis on forward-looking disclosure in earnings conference calls. The project compares traditional dictionary-based measurement of forward-looking information with large language model-based measures that attempt to capture richer contextual properties of management disclosure.
 
-## Overview
-
-Forward-looking disclosure is commonly measured using dictionary-based methods that identify forward-looking sentences through cue words such as *will*, *expect*, *anticipate*, and *forecast*. While this approach is transparent and replicable, it may not fully capture the context, specificity, tone, certainty, or economic meaning of what is being said.
-
-This project explores whether LLM-based document-level measures can add explanatory value by capturing contextual characteristics of forward-looking information in earnings conference call Q&A sections.
-
-The analysis focuses on:
-
-* dictionary-based forward-looking information;
-* LLM-based forward-looking intensity;
-* specificity;
-* economic substance;
-* tone;
-* certainty;
-* contextualized FLI composite measures;
-* cumulative abnormal returns around earnings conference calls.
+The analysis is built around earnings conference call Q&A sections, abnormal stock returns around the call date, and a set of disclosure measures covering forward-looking intensity, specificity, economic substance, tone, certainty, and qualitative disclosure categories.
 
 ## Research question
 
 > Does a large language model-based forward-looking information measure provide incremental explanatory power for abnormal stock returns around earnings conference calls relative to a traditional dictionary-based measure?
 
-## Data availability
+## Project summary
 
-The data used in this project were obtained through WRDS and related licensed data providers. This includes financial market data, accounting data, and earnings conference call transcript data.
+Forward-looking disclosure is often measured with dictionary methods that classify sentences as forward-looking when they contain cue words such as *will*, *expect*, *anticipate*, or *forecast*. These approaches are transparent and relatively easy to reproduce, but they can miss the context in which forward-looking language appears. A sentence can be future-oriented while still being vague, boilerplate, uncertain, economically empty, or disconnected from information that investors can price.
 
-Due to licensing restrictions, **raw data, processed datasets, transcript text, and intermediate data files are not included in this repository**.
+This thesis investigates whether LLM-based document-level measures add useful information beyond that traditional dictionary approach. The notebooks construct a sample of S&P 500 earnings conference call Q&A sections, generate dictionary and LLM disclosure measures, merge them with market and accounting controls, calculate cumulative abnormal returns, and estimate regression specifications that compare the explanatory power of alternative disclosure measures.
 
-The repository is intended to make the code structure, empirical workflow, and methodological choices transparent. Users with authorized WRDS access may reproduce the data construction steps using their own credentials and institutional permissions.
+At a high level, the empirical workflow covers:
 
-The relevant data folders and file types are excluded through `.gitignore`.
+* retrieving S&P 500 constituent, transcript, CRSP, and accounting data through licensed data sources;
+* preparing earnings call Q&A text and event-date inputs;
+* calculating dictionary-based forward-looking information;
+* generating LLM-based scores with local or OpenAI-compatible model endpoints;
+* validating LLM scores against manually reviewed observations and alternative model settings;
+* merging disclosure scores with returns, controls, and event-study outputs;
+* running descriptive statistics, multicollinearity diagnostics, and panel regression specifications.
+
+## Public repository scope
+
+This public repository is intended to document the structure and logic of the thesis workflow. It is not a self-contained replication package because the underlying data cannot be redistributed.
+
+Included:
+
+* Jupyter notebooks for data retrieval, transformation, measurement, validation, and regression analysis;
+* prompt and parsing logic used for LLM-based disclosure scoring;
+* dictionary-based forward-looking information logic;
+* regression-building notebooks and diagnostics;
+* a minimal Python dependency list in `requirements.txt`.
+
+Excluded:
+
+* raw WRDS downloads;
+* CRSP, Compustat, IBES, or Capital IQ data;
+* earnings conference call transcript text;
+* cleaned or merged datasets derived from licensed data;
+* LLM output files generated from licensed transcript text;
+* intermediate data files, benchmark outputs, private credentials, and access tokens.
+
+The `.gitignore` file excludes the local `data/` and `benchmarks/` directories. Those directories may exist in a private working copy, but they are intentionally not part of the public repository.
 
 ## Repository structure
 
 ```text
 .
-├── notebooks/
-│   ├── benchmarks and tokens/
-│   │   └── Notebooks related to token counts, model benchmarking, and context-window checks
-│   ├── control variable/
-│   │   └── Notebooks for constructing and preparing control variables
-│   ├── data retrieval/
-│   │   └── Notebooks for retrieving and organizing source data
-│   ├── methods/
-│   │   └── Notebooks related to measurement design and methodological implementation
-│   ├── regressions & analysis/
-│   │   └── Notebooks for regression analysis, robustness checks, tables, and interpretation
-│   └── transformation/
-│       └── Notebooks for cleaning, transforming, and merging datasets
-│
-├── validation/
-│   ├── validation.ipynb
-│   ├── validation_2_step.ipynb
-│   └── validation_all.ipynb
-│
-├── .gitignore
-├── README.md
-└── requirements.txt
+|-- notebooks/
+|   |-- benchmarks and tokens/
+|   |   |-- tokens.ipynb
+|   |   |-- llm_speed _reasoning.ipynb
+|   |   `-- llm_speed _reasoning_2step.ipynb
+|   |-- control variable/
+|   |   |-- control_vars.ipynb
+|   |   `-- word_count.ipynb
+|   |-- data retrieval/
+|   |   |-- sp500cons.ipynb
+|   |   |-- stock_data.ipynb
+|   |   `-- wrds_transcripts.ipynb
+|   |-- methods/
+|   |   |-- dictionary.ipynb
+|   |   `-- llm_local.ipynb
+|   |-- regressions & analysis/
+|   |   |-- descriptive_stats_llama.ipynb
+|   |   |-- descriptive_stats_qwen.ipynb
+|   |   |-- regression builder.ipynb
+|   |   |-- regression builder_contextual.ipynb
+|   |   |-- regression builder_contextual_alt_tone_regression_.ipynb
+|   |   |-- regression builder_dictfirst.ipynb
+|   |   `-- VIF.IPYNB
+|   `-- transformation/
+|       |-- final_datasets.ipynb
+|       |-- output_merging_llama.ipynb
+|       |-- output_merging_qwen.ipynb
+|       |-- output_sheet copy.ipynb
+|       `-- transcript_txt_saver.ipynb
+|
+|-- validation/
+|   |-- validation.ipynb
+|   |-- validation_2_step.ipynb
+|   `-- validation_all.ipynb
+|
+|-- .gitignore
+|-- README.md
+`-- requirements.txt
+```
+
+Expected local-only working directories:
+
+```text
+data/
+|-- raw/                         # WRDS downloads, transcript text, event-study inputs
+|-- processed/                   # constructed measures, merged datasets, regression outputs
+|-- processed/regressions/       # regression result tables
+|-- processed/regression_tables_latex/
+|-- output/final/                # completed LLM batch outputs
+|-- output/partial/              # checkpointed LLM batch outputs
+|-- samples/                     # validation and sampled observations
+|-- batches/                     # optional batch partitions
+`-- other/                       # supporting local files
+
+benchmarks/
+`-- final/                       # local model timing and benchmark outputs
 ```
 
 ## Methodology
 
-The empirical workflow consists of several main steps.
+### 1. Data retrieval
 
-### 1. Transcript preparation
+The retrieval notebooks collect and align the core data sources needed for the empirical sample.
 
-Earnings conference call Q&A sections are extracted and prepared for analysis. The focus on Q&A sections allows the analysis to examine more dynamic forward-looking communication between managers and analysts.
+* `notebooks/data retrieval/sp500cons.ipynb` builds S&P 500 membership and link tables.
+* `notebooks/data retrieval/wrds_transcripts.ipynb` retrieves earnings conference call metadata and Q&A transcript text.
+* `notebooks/data retrieval/stock_data.ipynb` retrieves CRSP market data used for return calculations and event-study inputs.
 
-### 2. Dictionary-based FLI measurement
+These notebooks require authorized access to WRDS and the relevant licensed databases. They are not expected to run in a public clone without credentials and institutional permissions.
 
-A traditional forward-looking information score is constructed using forward-looking cue words and sentence-level classification.
+### 2. Transcript preparation
 
-### 3. LLM-based disclosure measurement
+The thesis focuses on earnings conference call Q&A sections because they contain interactive exchanges between managers and analysts. The transformation notebooks prepare transcript-level observations and save text or merged outputs for later scoring.
 
-Earnings call Q&A sections are evaluated using instruction-tuned language models. The models produce document-level scores for forward-looking intensity and several contextual disclosure characteristics.
+Relevant notebooks:
 
-The main LLM-based variables are:
+* `notebooks/transformation/transcript_txt_saver.ipynb`
+* `notebooks/benchmarks and tokens/tokens.ipynb`
 
-* **Forward-looking intensity**: the extent to which the Q&A section discusses future-oriented information.
-* **Specificity**: the degree of precision, concreteness, and detail in forward-looking statements.
-* **Economic substance**: the extent to which the disclosure contains economically meaningful information.
-* **Tone**: the sentiment of the forward-looking content.
-* **Certainty**: the degree of confidence or commitment expressed in forward-looking statements.
+The token notebook checks document lengths against model context limits and creates tokenized transcript outputs used to identify observations that may need separate handling.
 
-### 4. Abnormal return calculation
+### 3. Dictionary-based measurement
 
-Cumulative abnormal returns are calculated around earnings conference call dates using an event-study framework.
+`notebooks/methods/dictionary.ipynb` constructs a traditional forward-looking information measure using rule-based sentence classification and forward-looking cue terms. This serves as the transparent baseline against which LLM-based disclosure measures are compared.
 
-### 5. Regression analysis
+### 4. LLM-based disclosure scoring
 
-The explanatory power of dictionary-based and LLM-based measures is tested using panel regressions with financial controls and fixed effects.
+`notebooks/methods/llm_local.ipynb` contains the main LLM scoring workflow. It uses an OpenAI-compatible client interface so that local inference servers can be used with instruction-tuned open-weight models.
 
-### 6. Validation and robustness checks
+The LLM scoring workflow produces document-level measures such as:
 
-The validation notebooks compare model outputs, manual validation scores, and alternative prompting strategies. Additional robustness checks evaluate alternative model specifications, event windows, fixed-effect structures, and composite disclosure measures.
+* **Forward-looking intensity** - how strongly the Q&A section discusses future-oriented information.
+* **Specificity** - how concrete, detailed, and precise the forward-looking disclosure is.
+* **Economic substance** - whether the disclosure contains economically meaningful information.
+* **Tone** - whether the future-oriented content is positive, neutral, negative, or mixed.
+* **Certainty** - how confident or committed the language is.
+* **Main and secondary focus categories** - qualitative labels describing the dominant content of the disclosure.
+* **Managerial horizon and outlook variables** - qualitative descriptors of time horizon and expected business conditions.
 
-## Reproducing the analysis
+The current notebooks reference Llama 3.1 8B Instruct as the main local model and Qwen-based outputs as an additional comparison or robustness path. Some validation notebooks also compare alternative model variants and prompting strategies.
 
-To run the notebooks, users need:
+### 5. Output parsing and merging
 
-* Python 3.x;
-* the required packages listed in `requirements.txt`;
-* authorized access to the required WRDS datasets;
-* local copies of the licensed data;
-* access to the relevant LLM environment or locally stored model outputs.
+LLM outputs are generated in batches and then parsed into structured score files.
 
-A typical setup is:
+Relevant notebooks:
+
+* `notebooks/transformation/output_merging_llama.ipynb`
+* `notebooks/transformation/output_merging_qwen.ipynb`
+* `notebooks/transformation/output_sheet copy.ipynb`
+
+These notebooks merge model output files, parse score fields, align outputs to company and call identifiers, and prepare model-specific processed datasets.
+
+### 6. Control variables
+
+The control-variable notebooks prepare firm, market, transcript, and event-date controls.
+
+Relevant notebooks:
+
+* `notebooks/control variable/word_count.ipynb`
+* `notebooks/control variable/control_vars.ipynb`
+
+Typical constructed inputs include word-count controls, accounting and financial ratios, event dates, CRSP-derived variables, and merged control datasets.
+
+### 7. Final dataset construction
+
+`notebooks/transformation/final_datasets.ipynb` combines the core empirical inputs:
+
+* cumulative abnormal return files;
+* dictionary-based FLI output;
+* parsed LLM disclosure scores;
+* control variables;
+* event dates and company identifiers.
+
+The resulting processed datasets are used by the descriptive statistics, diagnostics, and regression notebooks.
+
+### 8. Validation and robustness checks
+
+The validation notebooks compare LLM outputs across temperatures, prompting strategies, model variants, and manually reviewed observations.
+
+* `validation/validation.ipynb` evaluates the main one-step scoring setup across temperature settings.
+* `validation/validation_2_step.ipynb` evaluates a two-step scoring approach.
+* `validation/validation_all.ipynb` compares multiple model outputs on a validation sample.
+
+These notebooks are important because several LLM-based variables, such as certainty and economic substance, involve subjective judgment. Validation helps assess whether the model outputs are stable and interpretable enough to use as empirical disclosure measures.
+
+### 9. Regression analysis
+
+The regression notebooks estimate the main empirical specifications and robustness checks.
+
+* `notebooks/regressions & analysis/descriptive_stats_llama.ipynb`
+* `notebooks/regressions & analysis/descriptive_stats_qwen.ipynb`
+* `notebooks/regressions & analysis/regression builder.ipynb`
+* `notebooks/regressions & analysis/regression builder_contextual.ipynb`
+* `notebooks/regressions & analysis/regression builder_contextual_alt_tone_regression_.ipynb`
+* `notebooks/regressions & analysis/regression builder_dictfirst.ipynb`
+* `notebooks/regressions & analysis/VIF.IPYNB`
+
+The regression builders compare dictionary-first, LLM-first, contextual, and alternative tone specifications. The VIF notebook produces multicollinearity diagnostics, including numerical VIF, categorical dummy VIF, mixed VIF, and grouped categorical diagnostics.
+
+## Typical execution order
+
+There is no single pipeline script. The project is organized as a set of staged notebooks. A typical private reproduction workflow is:
+
+1. Install dependencies and configure WRDS credentials.
+2. Run `notebooks/data retrieval/sp500cons.ipynb`.
+3. Run `notebooks/data retrieval/wrds_transcripts.ipynb`.
+4. Run `notebooks/data retrieval/stock_data.ipynb`.
+5. Run transcript preparation and token checks.
+6. Run `notebooks/methods/dictionary.ipynb`.
+7. Run `notebooks/methods/llm_local.ipynb` with the intended local model endpoint.
+8. Merge and parse LLM outputs with the transformation notebooks.
+9. Construct word-count and financial controls.
+10. Build final model-specific datasets with `final_datasets.ipynb`.
+11. Run validation notebooks.
+12. Run descriptive statistics, VIF diagnostics, and regression notebooks.
+
+Because some notebooks depend on local files produced by earlier notebooks, check the expected input filenames at the top of each notebook before executing it.
+
+## Environment setup
+
+Create a Python environment and install the listed dependencies:
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Then run the notebooks in the relevant folders.
+The dependency file currently includes packages for WRDS access, data handling, tokenization, LLM calls, model utilities, plotting, and regression analysis:
 
-Because the underlying data are not publicly available, the notebooks will not run end-to-end without authorized access to the required WRDS datasets and local data files.
+* `wrds`
+* `pyarrow`
+* `tiktoken`
+* `tqdm`
+* `matplotlib`
+* `pandas`
+* `nltk`
+* `openai`
+* `openpyxl`
+* `transformers`
+* `huggingface_hub`
+* `statsmodels`
+* `jinja2`
 
-## Notes on data and licensing
+Depending on your local Jupyter setup, you may also need notebook tooling such as `jupyter` or `ipykernel`.
 
-This repository does **not** include:
+## LLM setup
 
-* raw WRDS downloads;
-* CRSP, Compustat, or Capital IQ data;
-* earnings conference call transcript text;
-* cleaned or merged datasets derived from licensed sources;
-* intermediate data files;
-* private credentials or access tokens.
+The LLM notebooks use the `openai` Python client against an OpenAI-compatible API endpoint. In the thesis workflow, this pattern was used for local inference with open-weight models.
 
-The repository may include code, prompts, SQL/query logic, analysis notebooks, and table-generation scripts.
+Before running the LLM notebooks, make sure that:
 
-## Notes on LLM use
+* the local model server is running;
+* the notebook `base_url` points to the server endpoint;
+* the selected model name matches the model loaded by the server;
+* the API key handling matches the requirements of the local server;
+* context-window limits have been checked with the token notebooks;
+* batch output folders exist under `data/output/final/` and `data/output/partial/`.
 
-The LLM-based measures were generated using instruction-tuned open-weight models. The prompts and scoring logic are included to make the measurement approach transparent.
+The public repository does not include generated LLM outputs because those outputs are derived from licensed transcript text.
 
-The LLM outputs should be interpreted as computational disclosure measures rather than definitive human judgments. Manual validation and robustness checks were used to assess the consistency and usefulness of the measures.
+## Reproducibility notes
 
-## Limitations
+This repository is useful for understanding and auditing the empirical design, but a public clone will not run end-to-end without the missing licensed inputs. To reproduce the workflow privately, you need:
 
-This repository reflects the empirical workflow of a master thesis project. Important limitations include:
+* Python 3.x and the packages in `requirements.txt`;
+* Jupyter or another notebook runner;
+* authorized WRDS access;
+* access to CRSP, Compustat, IBES, Capital IQ transcript data, or equivalent licensed sources used in the thesis;
+* local `data/` folders following the expected layout;
+* an OpenAI-compatible LLM endpoint or equivalent scoring outputs;
+* enough compute and storage for transcript processing and LLM batch scoring.
 
-* the use of licensed financial and transcript data that cannot be redistributed;
-* dependence on the selected LLM, prompt design, and scoring definitions;
-* measurement uncertainty in subjective disclosure characteristics such as certainty and economic substance;
-* limited ability to fully validate document-level LLM judgments against human-coded benchmarks;
-* the exploratory nature of several contextual disclosure measures.
+The notebooks use project-root discovery based on the presence of the local `data/` directory. If the notebooks cannot find paths correctly, confirm that the `data/` folder exists at the repository root.
+
+## Main limitations
+
+Important limitations of the project and repository include:
+
+* the underlying licensed data cannot be redistributed;
+* document-level LLM judgments may contain measurement error;
+* prompt wording, model choice, temperature, and parsing rules can affect scores;
+* validation samples are necessarily smaller than the full empirical sample;
+* some contextual concepts, such as certainty and economic substance, are inherently subjective;
+* the notebooks reflect a thesis research workflow rather than a production-grade data pipeline.
 
 ## Acknowledgement
 
@@ -161,9 +311,11 @@ Wharton Research Data Services (WRDS) was used in preparing this research. This 
 ## Author
 
 **Joost Gaasbeek**
+
 MSc Business Analytics & Management
+
 Rotterdam School of Management, Erasmus University
 
 ## Disclaimer
 
-This repository is shared for transparency and educational purposes. The official assessed thesis remains the version submitted through the university’s thesis submission system. Any later changes to this repository, notebooks, or accompanying documents should be interpreted as independent post-submission refinements.
+This repository is shared for transparency and educational purposes. The official assessed thesis remains the version submitted through the university's thesis submission system. Any later changes to this repository, notebooks, or accompanying documents should be interpreted as independent post-submission refinements.
