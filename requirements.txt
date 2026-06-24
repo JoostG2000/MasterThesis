@@ -1,0 +1,14 @@
+wrds
+pyarrow
+tiktoken
+tqdm
+matplotlib
+pandas
+nltk
+openai
+openpyxl
+transformers
+matplotlib
+huggingface_hub
+statsmodels
+jinja2
